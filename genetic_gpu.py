@@ -61,7 +61,7 @@ class genetic_algo(object):
             s = 0
 
             for _ in range(self.max_step): # 250 steps .     instead of (for _ = 1, _ < n ,_ ++ )
-                inp = torch.Tensor(observation).type('torfch.cuda.FloatTensor')
+                inp = torch.Tensor(observation).type('torch.cuda.FloatTensor')
                 mu = agent(inp) # we input the observation into our agent. observation == input layer 
                 mu = mu.detach().cpu().numpy() # don't matter to gradient, don't record operations on this tensor
                 action = mu #action is output of the system, in numpy format, with no recording (detached)
