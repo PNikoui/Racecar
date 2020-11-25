@@ -103,16 +103,21 @@ class genetic_algo(object):
     # used by add_elite and train
     def run_agents_n_times(self, agents, runs):
 
-        pool = mp.Pool(processes=24) # multithreading programming, max 24 processes
+        #pool = mp.Pool(processes=24) # multithreading programming, max 24 processes
         env = RacecarEnv(self.num_turns)  
         seeds = []
         random.seed() #initialize the random number generator
         for i in range(runs):
             seeds.append(random.randint(1, 10000)) #wtf are seeds??
-
-        results = [pool.apply_async(self.step, args=(x, runs, env, seeds)) for x in agents]
+         
+        for x in agents:
+            results = self.step(x, runs, env, seeds)
+            
+        #results = [pool.apply_async(self.step, args=(x, runs, env, seeds)) for x in agents]
+        
+        
         reward_agents = [-p.get() for p in results] # why minus ???? 
-        pool.close() #close multithread
+        #pool.close() #close multithread
 
         return reward_agents
 
