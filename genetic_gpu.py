@@ -5,16 +5,9 @@ import numpy as np
 import multiprocessing as mp
 import random
 import copy
-import matplotlib.pyplot as plt
-import cupy as cp
+
 
 cuda = torch.device('cuda') 
-
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-import gym
-from gym import wrappers
 
 from model import seekndestroy 
 from environment import RacecarEnv
