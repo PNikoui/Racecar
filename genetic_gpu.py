@@ -5,7 +5,7 @@ import numpy as np
 import multiprocessing as mp
 import random
 import copy
-
+import cupy as cp
 
 cuda = torch.device('cuda') 
 
