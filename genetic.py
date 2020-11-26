@@ -4,9 +4,15 @@ import numpy as np
 import multiprocessing as mp
 import random
 import copy
+import matplotlib.pyplot as plt 
 
 from model import seekndestroy
 from environment import RacecarEnv
+
+# Use GPU
+use_cuda = torch.cuda.is_available()
+device = torch.device("cuda:0" if use_cuda else "cpu")
+# torch.backends.cudnn.benchmark = True
 
 class genetic_algo(object):
 
@@ -17,8 +23,10 @@ class genetic_algo(object):
 
     def init_weights(self, m):
         if ((type(m) == nn.Linear) | (type(m) == nn.Conv2d)):
+            m.to(device)
             nn.init.xavier_uniform(m.weight)
             m.bias.data.fill_(0.00)
+            
 
     def return_random_agents(self, num_agents):
         agents = []
@@ -47,6 +55,7 @@ class genetic_algo(object):
 
             for _ in range(self.max_step):
                 inp = torch.tensor(observation).type('torch.FloatTensor')
+                inp.to(device)
                 mu = agent(inp)
                 mu = mu.detach().numpy()
                 action = mu
@@ -87,7 +96,7 @@ class genetic_algo(object):
 
         return reward_agents
 
-    def crossover(self, father, mother, crossover_num=2):
+    def crossover(self, father, mother, crossover_num=10):
 
         child_1_agent = copy.deepcopy(father)
         child_2_agent = copy.deepcopy(mother)
@@ -113,7 +122,7 @@ class genetic_algo(object):
     def mutate(self, agent):
 
         child_agent = copy.deepcopy(agent)
-        mutation_power = 0.02 # hyper-parameter, set from https://arxiv.org/pdf/1712.06567.pdf
+        mutation_power = 0.4 # 0.02 hyper-parameter, set from https://arxiv.org/pdf/1712.06567.pdf
         mutation_occ = 1
 
         for param in child_agent.parameters():
@@ -226,3 +235,7 @@ class genetic_algo(object):
             # Saving weights
             if generation % 10 == 0:
                 torch.save(agents[elite_index].state_dict(), 'models/' + file + '_{}'.format(generation))
+                plt.plot(np.arange(len(rewards)),rewards)
+                plt.xlabel('Epochs')
+                plt.ylabel('Reward')
+                plt.show()
