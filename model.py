@@ -1,5 +1,4 @@
 import torch.nn as nn
-import torch
 
 class seekndestroy(nn.Module):
 
@@ -17,7 +16,8 @@ class seekndestroy(nn.Module):
 
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
-
+        self.sigmoid = nn.sigmoid()
+        
     def forward(self, inputs):
 
         xd = self.deep_1(inputs)
@@ -29,18 +29,8 @@ class seekndestroy(nn.Module):
         xd = self.deep_4(xd)
         xd = self.relu(xd)
 
-        m = self.out(xd) # 2 vectors/ values 
-        m = self.tanh(m)
-        
-        #print(m)
-        return m #returns a probability, after passing input through NN 
+        m = self.out(xd)
+#         m = self.tanh(m)
+        m = self.sigmoid(m)
 
-tan = nn.Tanh()
-input = torch.tensor([[1., -1.], [1., -1.]])
-output = tan(input)
-#print(output)
-
-
-
-agent = seekndestroy()
-#print(agent)
+        return m
