@@ -1,11 +1,24 @@
 import os
 import torch
 import torch.nn as nn
+
+from torch.utils.dlpack import to_dlpack
+from torch.utils.dlpack import from_dlpack
+
 import numpy as np
 import multiprocessing as mp
 import random
 import copy
+import matplotlib.pyplot as plt
+import pandas as pd        
 import cupy as cp
+
+
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+import gym
+from gym import wrappers
 
 cuda = torch.device('cuda') 
 
@@ -53,14 +66,20 @@ class genetic_algo(object):
             r = 0
             s = 0
 
-            for _ in range(self.max_step): # 250 steps .     instead of (for _ = 1, _ < n ,_ ++ )
+            for _ in range(self.max_step): # 250 steps 
                 inp = torch.Tensor(observation).type('torch.cuda.FloatTensor')
                 mu = agent(inp) # we input the observation into our agent. observation == input layer 
-                mu = mu.detach().cpu().numpy() # don't matter to gradient, don't record operations on this tensor
-                action = mu #action is output of the system, in numpy format, with no recording (detached)
+                
+                mu = mu.detach().cpu().numpy()
+
+                
+                #mu = cp.fromDlpack(to_dlpack(mu)) # don't matter to gradient, don't record operations on this tensor
+                #mu = cp.asarray(mu)
+                
+                action = mu #action is output of the system, in numpy format, with no recording (detached
 
                 # action is matrix of 2 * something
-                action[0][1] = action[0][1] * cp.pi / 4  # multiply by pi/4 . pi/4 = 45 degrees. something with direction ... 
+                action[0][1] = action[0][1] * (cp.pi/4)  # multiply by pi/4 . pi/4 = 45 degrees. something with direction ... 
 
                 new_observation, reward, done, info = env.step(action)
                 # we take a step, new_obs is the new state of the system
@@ -102,14 +121,17 @@ class genetic_algo(object):
         random.seed() #initialize the random number generator
         for i in range(runs):
             seeds.append(random.randint(1, 10000)) #wtf are seeds??
-         
-        for x in agents:
-            results = self.step(x, runs, env, seeds)
-            
+
         #results = [pool.apply_async(self.step, args=(x, runs, env, seeds)) for x in agents]
         
+        results = []
+        for x in agents:
+            result = self.step(x, runs, env, seeds) 
+            results.append(result)
         
-        reward_agents = [-p.get() for p in results] # why minus ???? 
+        #reward_agents = [-p.get() for p in results] # why minus ???? 
+
+        reward_agents = [-p for p in results]
         #pool.close() #close multithread
 
         return reward_agents
@@ -124,7 +146,6 @@ class genetic_algo(object):
         cross_idx = cp.random.randint(sum(p.numel() for p in father.parameters()), size=crossover_num)  #   ?????? 
         # numel returns the total number or elements in the tensor (dim1*dim2*....)
         # why randint(--- , 2) ??
-
         # generate new parameters . 
 
         cnt = 0
@@ -294,6 +315,6 @@ if __name__ == "__main__":
     print("Files in %r: %s" % (cwd, files))
 
     algo = genetic_algo(2)  
-    algo.train(3, 10,  10, 'test')
+    algo.train(10, 30,  10, 'test')
 
 
