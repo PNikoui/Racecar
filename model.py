@@ -16,7 +16,7 @@ class seekndestroy(nn.Module):
 
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
-        self.sigmoid = nn.sigmoid()
+        self.sigmoid = nn.Sigmoid()
         
     def forward(self, inputs):
 
