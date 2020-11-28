@@ -239,7 +239,7 @@ class genetic_algo(object):
             # Saving weights
             if generation % 10 == 0:
                 torch.save(agents[elite_index].state_dict(), 'models/' + file + '_{}'.format(generation))
-                plt.plot(np.arange(len(Fitness)), Fitness, label('The Top Rewards'), 'rD', markersize=9)
+                plt.plot(np.arange(len(Fitness)), Fitness, label ='The Top Rewards', 'rD', markersize=9)
                 plt.xlabel('Epochs')
                 plt.ylabel('Fitness')
                 plt.legend()
