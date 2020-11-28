@@ -209,7 +209,9 @@ class genetic_algo(object):
         agents = self.return_random_agents(num_agents)
 
         elite_index = None
-
+        
+        Fitness = []
+        
         for generation in range(generations):
             # return rewards of agents
             rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
@@ -222,6 +224,8 @@ class genetic_algo(object):
             for best_parent in sorted_parent_indexes:
                 top_rewards.append(rewards[best_parent])
 
+            Fitness.append(min(top_rewards))
+            
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
             print("Top ", top_limit, " scores", sorted_parent_indexes)
             print("Rewards for top: ", top_rewards)
@@ -235,7 +239,8 @@ class genetic_algo(object):
             # Saving weights
             if generation % 10 == 0:
                 torch.save(agents[elite_index].state_dict(), 'models/' + file + '_{}'.format(generation))
-                plt.plot(np.arange(len(rewards)),rewards)
+                plt.plot(np.arange(len(Fitness)), Fitness, label('The Top Rewards'), 'rD', markersize=9)
                 plt.xlabel('Epochs')
-                plt.ylabel('Reward')
+                plt.ylabel('Fitness')
+                plt.legend()
                 plt.show()
