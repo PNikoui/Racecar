@@ -7,7 +7,9 @@ class seekndestroy(nn.Module):
 
         #deep
         self.deep_1 = nn.Linear(input_dim, 128, bias=True)
-        self.deep_2 = nn.Linear(128, 64, bias=True)
+        self.Conv1 = nn.Conv1d(128, 64, 3, stride = 3, padding =3)
+        self.Pool1 = nn.MaxPool1d(2)
+#         self.deep_2 = nn.Linear(128, 64, bias=True)
         self.deep_3 = nn.Linear(64, 32, bias=True)
         self.deep_4 = nn.Linear(32, 16, bias=True)
 
@@ -22,7 +24,11 @@ class seekndestroy(nn.Module):
 
         xd = self.deep_1(inputs)
         xd = self.relu(xd)
-        xd = self.deep_2(xd)
+        xd = xd.unsqueeze(0).permute(0, 2, 1)
+#         xd = self.deep_2(xd)
+        xd = self.Conv1(xd)
+        xd = self.Pool1(xd)
+        xd = xd.view(1,64)
         xd = self.relu(xd)
         xd = self.deep_3(xd)
         xd = self.relu(xd)
