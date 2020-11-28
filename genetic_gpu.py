@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 from model import seekndestroy
 from environment import RacecarEnv
 
-# # Use GPU
-# use_cuda = torch.cuda.is_available()
-# device = torch.device("cuda:0" if use_cuda else "cpu")
+# Use GPU
+use_cuda = torch.cuda.is_available()
+device = torch.device("cuda:0" if use_cuda else "cpu")
 # torch.backends.cudnn.benchmark = True
 
 class genetic_algo(object):
@@ -33,9 +33,6 @@ class genetic_algo(object):
         for _ in range(num_agents):
 
             agent = seekndestroy()
-#             if torch.cuda.is_available():
-#                 agent.cuda()
-
 
             for param in agent.parameters():
                 param.requires_grad = False
@@ -102,12 +99,12 @@ class genetic_algo(object):
 
         return reward_agents
 
-    def crossover(self, father, mother, crossover_num=10):
+    def crossover(self, father, mother, Num_Crossover):
 
         child_1_agent = copy.deepcopy(father)
         child_2_agent = copy.deepcopy(mother)
 
-        cross_idx = np.random.randint(sum(p.numel() for p in father.parameters()), size=crossover_num)
+        cross_idx = np.random.randint(sum(p.numel() for p in father.parameters()), size=Num_Crossover)
 
         cnt = 0
         switch_flag = False
@@ -125,10 +122,10 @@ class genetic_algo(object):
 
         return child_1_agent, child_2_agent
 
-    def mutate(self, agent):
+    def mutate(self, agent, Mutation_Power):
 
         child_agent = copy.deepcopy(agent)
-        mutation_power = 0.4 # 0.02 hyper-parameter, set from https://arxiv.org/pdf/1712.06567.pdf
+        # mutation_power = 0.4 # 0.02 hyper-parameter, set from https://arxiv.org/pdf/1712.06567.pdf
         mutation_occ = 1
 
         for param in child_agent.parameters():
@@ -138,17 +135,17 @@ class genetic_algo(object):
                     for i1 in range(param.shape[1]):
                         p = random.random()
                         if p <= mutation_occ:
-                            param[i0][i1] += mutation_power * np.random.randn()
+                            param[i0][i1] += Mutation_Power * np.random.randn()
 
             elif(len(param.shape) == 1): # biases of linear layer or conv layer
                 for i0 in range(param.shape[0]):
                     p = random.random()
                     if p <= mutation_occ:
-                        param[i0] += mutation_power * np.random.randn()
+                        param[i0] += Mutation_Power * np.random.randn()
 
             return child_agent
 
-    def return_children(self, agents, sorted_parent_indexes, elite_index):
+    def return_children(self, agents, sorted_parent_indexes, elite_index, Num_Crossover, Mutation_Power):
 
         children_agents = []
 
@@ -161,15 +158,15 @@ class genetic_algo(object):
             father = sorted_parent_indexes[np.random.randint(len(sorted_parent_indexes))]
             mother = sorted_parent_indexes[np.random.randint(len(sorted_parent_indexes))]
 
-            child_1, child_2 = self.crossover(agents[father], agents[mother])
-            child_1 = self.mutate(child_1)
-            child_2 = self.mutate(child_2)
+            child_1, child_2 = self.crossover(agents[father], agents[mother], Num_Crossover)
+            child_1 = self.mutate(child_1, Mutation_Power)
+            child_2 = self.mutate(child_2, Mutation_Power)
 
             children_agents.extend([child_1, child_2])
 
         for i in range(9):
             mutant = sorted_parent_indexes[np.random.randint(len(sorted_parent_indexes))]
-            mutant = self.mutate(agents[mutant])
+            mutant = self.mutate(agents[mutant], Mutation_Power)
 
             children_agents.append(mutant)
 
@@ -210,11 +207,10 @@ class genetic_algo(object):
 
         return child_agent, top_score
 
-    def train(self, num_agents, generations, top_limit, file):
+    def train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
 
         agents = self.return_random_agents(num_agents)
-        agents = agents.to(device)
-        
+
         elite_index = None
         
         Fitness = []
@@ -238,7 +234,7 @@ class genetic_algo(object):
             print("Rewards for top: ", top_rewards)
 
             # setup an empty list for containing children agents
-            children_agents, elite_index, top_score = self.return_children(agents, sorted_parent_indexes, elite_index)
+            children_agents, elite_index, top_score = self.return_children(agents, sorted_parent_indexes, elite_index, Num_Crossover, Mutation_Power)
 
             # kill all agents, and replace them with their children
             agents = children_agents
