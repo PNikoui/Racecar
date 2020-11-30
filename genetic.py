@@ -16,7 +16,7 @@ device = torch.device("cuda:0" if use_cuda else "cpu")
 
 class genetic_algo(object):
 
-    def __init__(self, processors, max_step=250, num_turns):
+    def __init__(self, processors, num_turns, max_step=250):
         self.max_step = max_step
         self.processors = processors
         self.num_turns = num_turns
