@@ -19,6 +19,7 @@ class seekndestroy(nn.Module):
         self.relu = nn.ReLU()
         self.tanh = nn.Tanh()
         self.sigmoid = nn.Sigmoid()
+        self.softmax = nn.Softmax()
         
     def forward(self, inputs):
 
@@ -37,6 +38,7 @@ class seekndestroy(nn.Module):
 
         m = self.out(xd)
 #         m = self.tanh(m)
-        m = self.sigmoid(m)
+#         m = self.sigmoid(m)
+        m = self.softmax(m)
 
         return m
