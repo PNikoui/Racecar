@@ -88,7 +88,9 @@ class genetic_algo(object):
         seeds = []
         random.seed()
         for i in range(runs):
-            seeds.append(random.randint(1, 10000))
+            seeds.append(random.randint(1, 1))
+
+        # model.load_state_dict(torch.load(PATH))
 
         results = [pool.apply_async(self.step, args=(x, runs, env, seeds)) for x in agents]
         reward_agents = [-p.get() for p in results]
@@ -206,6 +208,7 @@ class genetic_algo(object):
 
     def train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
 
+
         agents = self.return_random_agents(num_agents)
 
         elite_index = None
@@ -214,6 +217,8 @@ class genetic_algo(object):
         
         for generation in range(generations):
             # return rewards of agents
+
+
             rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
 
             sorted_parent_indexes = np.argsort(rewards)[::-1][:top_limit] # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
@@ -238,9 +243,13 @@ class genetic_algo(object):
 
             # Saving weights
             if generation % 10 == 0:
-                torch.save(agents[elite_index].state_dict(), 'models/' + file + '_{}'.format(generation))
-                plt.plot(np.arange(len(Fitness)), Fitness, 'rD', markersize=9, label =('The Top Rewards'))
-                plt.xlabel('Epochs')
-                plt.ylabel('Fitness')
-                plt.legend()
-                plt.show()
+
+              ELITE_AGENTS = agents[elite_index]
+              torch.save(ELITE_AGENTS.state_dict(), 'models/' + file + '_{}'.format(generation))
+              agents = ELITE_AGENTS.load_state_dict(torch.load('models/' + file + '_{}'.format(generation)))
+
+              plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
+              plt.xlabel('Epochs')
+              plt.ylabel('Fitness')
+              plt.legend()
+              plt.show()
