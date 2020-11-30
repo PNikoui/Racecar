@@ -26,7 +26,30 @@ class genetic_algo(object):
             m.to(device)
             nn.init.xavier_uniform(m.weight)
             m.bias.data.fill_(0.00)
-            
+
+    def update_weights(self, m, PATH):
+      if ((type(m) == nn.Linear) | (type(m) == nn.Conv2d)):
+        m.to(device)
+        m.load_state_dict(torch.load(PATH))
+          # Update the parameter.
+          # New_agents[name].copy_(param)
+             
+
+    def return_updated_weights(self, agent, PATH):
+
+        num_agents = len(agent)
+        agents = []
+        for _ in range(num_agents):
+
+            agent = seekndestroy()
+
+            for param in agent.parameters():
+                param.requires_grad = False
+
+            self.update_weights(agent, PATH)
+            agents.append(agent)
+
+        return agents
 
     def return_random_agents(self, num_agents):
         agents = []
@@ -155,8 +178,9 @@ class genetic_algo(object):
             # Picking random mother and father
 
             father = sorted_parent_indexes[np.random.randint(len(sorted_parent_indexes))]
+            # print(father)
             mother = sorted_parent_indexes[np.random.randint(len(sorted_parent_indexes))]
-
+            # print(mother)
             child_1, child_2 = self.crossover(agents[father], agents[mother], Num_Crossover)
             child_1 = self.mutate(child_1, Mutation_Power)
             child_2 = self.mutate(child_2, Mutation_Power)
@@ -210,7 +234,7 @@ class genetic_algo(object):
 
 
         agents = self.return_random_agents(num_agents)
-
+        print(len(agents))
         elite_index = None
         
         Fitness = []
@@ -218,7 +242,7 @@ class genetic_algo(object):
         for generation in range(generations):
             # return rewards of agents
 
-
+            
             rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
 
             sorted_parent_indexes = np.argsort(rewards)[::-1][:top_limit] # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
@@ -240,14 +264,19 @@ class genetic_algo(object):
 
             # kill all agents, and replace them with their children
             agents = children_agents
-
+      
             # Saving weights
             if generation % 10 == 0:
+              
+              # Curriculum learning, update the children agents to start from the best saved parent agents
+              PATH = 'models/' + file + '_{}'.format(generation)
+              torch.save(agents[elite_index].state_dict(), PATH)
+              agents = self.return_updated_weights(agents, PATH)           
 
-              ELITE_AGENTS = agents[elite_index]
-              torch.save(ELITE_AGENTS.state_dict(), 'models/' + file + '_{}'.format(generation))
-              agents = ELITE_AGENTS.load_state_dict(torch.load('models/' + file + '_{}'.format(generation)))
-
+              # optimizer = TheOptimizerClass(*args, **kwargs)
+              # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+              # checkpoint = torch.load(PATH)
+              
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
               plt.xlabel('Epochs')
               plt.ylabel('Fitness')
