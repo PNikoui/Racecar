@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 
 class seekndestroy(nn.Module):
@@ -6,9 +7,9 @@ class seekndestroy(nn.Module):
         super().__init__()
 
         #deep
-        self.Conv1 = nn.Conv1d(input_dim, 7, 5, stride = 5, padding =5)
+        self.Conv1 = nn.Conv1d(input_dim, 14, 5, stride = 5, padding =5)
         self.Pool1 = nn.MaxPool1d(2)
-        self.deep_1 = nn.Linear(9, 128, bias=True)
+        self.deep_1 = nn.Linear(30, 128, bias=True)
         self.deep_2 = nn.Linear(128, 64, bias=True)
         self.deep_3 = nn.Linear(64, 32, bias=True)
         self.deep_4 = nn.Linear(32, 16, bias=True)
@@ -41,8 +42,11 @@ class seekndestroy(nn.Module):
 #         xd = self.Pool1(xd)
 
         # Fully Connected Block
+        # print(xd.shape)
         xd = xd.view(1,xd.shape[1]*xd.shape[2])
-        xd = xd.append(P_and_V)
+        # print(xd.shape)
+        xd = torch.cat((xd,P_and_V), 1)
+        # print(xd.shape)
         xd = self.deep_1(xd)
         xd = self.relu(xd)
         xd = self.deep_2(xd)
@@ -51,13 +55,14 @@ class seekndestroy(nn.Module):
         xd = self.relu(xd)
         xd = self.deep_4(xd)
         xd = self.relu(xd)
+        xd = xd.unsqueeze(0)
         
         # LSTM Block
         # RNN returns output and last hidden state
-        x, (h, c) = self.lstm(xd)
+        x, (h, c) = self.LSTM(xd)
         
         # Flatten output for feed-forward layer
-        x = x.view(-1, self.lstm.hidden_size)
+        x = x.view(-1, self.LSTM.hidden_size)
         
         # Output layer
         x = self.l_out(x)
