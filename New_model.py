@@ -7,7 +7,7 @@ class seekndestroy(nn.Module):
         super().__init__()
 
         #deep
-        self.Conv1 = nn.Conv1d(input_dim, 14, 5, stride = 5, padding =5)
+        self.Conv1 = nn.Conv1d(input_dim, 14, 2, stride = 1, padding =1)  #, dilation=2
         self.Pool1 = nn.MaxPool1d(2)
         self.deep_1 = nn.Linear(31, 128, bias=True)
         self.deep_2 = nn.Linear(128, 30, bias=True)
@@ -36,22 +36,21 @@ class seekndestroy(nn.Module):
     def forward(self, inputs):
         
         # Convolution Block
-        print(inputs.shape)
+        
         Sensor_Reading = inputs[:,:30]
         Input_Args = inputs[:,30:]   ## [dist/maxdist ratio to goal, angle, sign, POSITION, VELOCITY]
-        D_and_A_and_S = input_Args[:,:3]
+        D_and_A_and_S = Input_Args[:,:3]
         P_and_V = Input_Args[:,-2:]  ## Append P and V to output of convolution 
         xd = Sensor_Reading.unsqueeze(0).permute(0, 2, 1)
-        print(xd.shape)
+        
         xd = self.Conv1(xd)
         xd = self.relu(xd)
 #         xd = self.Pool1(xd)
 
         # Fully Connected Block
-        print(xd.shape)
+        
         xd = xd.view(1,xd.shape[1]*xd.shape[2])
-        # print(xd.shape)
-        # print(xd.shape)
+       
         xd = torch.cat((xd,D_and_A_and_S), 1)
         xd = self.deep_1(xd)
         xd = self.relu(xd)
