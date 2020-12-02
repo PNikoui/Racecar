@@ -6,7 +6,8 @@ import random
 import copy
 import matplotlib.pyplot as plt 
 
-from model import seekndestroy
+# from model import seekndestroy
+from model2 import seekndestroy
 from environment import RacecarEnv
 
 # Use GPU
