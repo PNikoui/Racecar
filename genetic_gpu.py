@@ -1,25 +1,6 @@
 import torch
 import torch.nn as nn
 import numpy as np
-import random
-import copy
-import matplotlib.pyplot as plt 
-
-from model import seekndestroy
-from environment import RacecarEnv
-
-# Use GPU
-use_cuda = torch.cuda.is_available()
-device = torch.device("cuda:0" if use_cuda else "cpu")
-# torch.backends.cudnn.benchmark = True
-
-class genetic_algo(object):
-
-    def __init__(self, processors, max_step=250, num_turns=5):
-        self.max_step = max_step
-        self.processors = processorsimport torch
-import torch.nn as nn
-import numpy as np
 import multiprocessing as mp
 import random
 import copy
