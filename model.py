@@ -38,7 +38,10 @@ class seekndestroy(nn.Module):
 
         m = self.out(xd)
 #         m = self.tanh(m)
-#         m = self.sigmoid(m)
-        m = self.softmax(m)
+        m = self.sigmoid(m)
+#         m = self.softmax(m)
 
         return m
+
+    def loss(self, action_probabilities, returns):
+        return -torch.mean(torch.mul(torch.log(action_probabilities), returns))

@@ -234,7 +234,7 @@ class genetic_algo(object):
 
 
         agents = self.return_random_agents(num_agents)
-        print(len(agents))
+        
         elite_index = None
         
         Fitness = []
