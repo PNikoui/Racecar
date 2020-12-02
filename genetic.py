@@ -7,7 +7,7 @@ import copy
 import matplotlib.pyplot as plt 
 
 # from model import seekndestroy
-from model2 import seekndestroy
+from New_model import seekndestroy
 from environment import RacecarEnv
 
 # Use GPU
