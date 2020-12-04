@@ -72,6 +72,7 @@ class genetic_algo(object):
         rs = []
 
         for run in range(runs):
+          print("Run number:", run)
 
             observation = env.reset(seeds[run])
             r = 0
@@ -90,10 +91,25 @@ class genetic_algo(object):
 
                 r = r + reward
                 s = s + 1
+                
+                old_DIST = observation[-1][-5]
+                # old_ANGLE = observation[:,-4]
+                
                 observation = new_observation
+                
+                new_DIST = observation[-1][-5]
+                new_ANGLE = observation[-1][-4]
+                
 
                 if(done):
                     break
+
+            if new_ANGLE > np.pi/2   
+                r += 100
+            
+            if env.closer(old_DIST,new_DIST) == 0:
+                r += 100 * 3
+
 
             if reward == -99:
                 r += np.sqrt((env.goal[0] - env.sim.car[0])**2 + (env.goal[1] - env.sim.car[1])**2) * 10 * 3
