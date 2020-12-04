@@ -120,9 +120,11 @@ class genetic_algo(object):
 
             if new_ANGLE > np.pi/2:   
                 r += 100
+                # print("Recieved extra angle penalty")
             
             if closer(old_DIST,new_DIST) == 0:
-                r += 100 * 3
+                r += np.abs((old_DIST-new_DIST))*10 * 3
+                # print("Recieved extra distance penalty")
 
 
             if reward == -99:
@@ -277,6 +279,7 @@ class genetic_algo(object):
 
             
             rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
+            print(rewards)
 
             sorted_parent_indexes = np.argsort(rewards)[::-1][:top_limit] # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
 
@@ -284,7 +287,7 @@ class genetic_algo(object):
 
             top_rewards = []
             for best_parent in sorted_parent_indexes:
-                top_rewards.append(rewards[best_parent])
+                top_rewards.append(np.array(rewards)[best_parent])
 
             Fitness.append(min(top_rewards))
             
@@ -309,9 +312,12 @@ class genetic_algo(object):
               # optimizer = TheOptimizerClass(*args, **kwargs)
               # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
               # checkpoint = torch.load(PATH)
-              
+
+            if generation == generations-1:
+              # Save the final fitness plot  
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
               plt.xlabel('Epochs')
               plt.ylabel('Fitness')
               plt.legend()
               plt.show()
+              plt.savefig('Fitness.pdf')
