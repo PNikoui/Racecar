@@ -1,13 +1,12 @@
 import torch
 import torch.nn as nn
 import numpy as np
-import multiprocessing as mp
 import random
 import copy
 import matplotlib.pyplot as plt 
 
-# from model import seekndestroy
-from New_model import seekndestroy
+from model import seekndestroy
+# from New_model import seekndestroy
 from environment import RacecarEnv
 
 # Use GPU
@@ -31,6 +30,7 @@ class genetic_algo(object):
     def update_weights(self, m, PATH):
       if ((type(m) == nn.Linear) | (type(m) == nn.Conv2d)):
         m.to(device)
+        m.get_device()
         m.load_state_dict(torch.load(PATH))
           # Update the parameter.
           # New_agents[name].copy_(param)
@@ -114,9 +114,13 @@ class genetic_algo(object):
             seeds.append(random.randint(1, 1))
 
         # model.load_state_dict(torch.load(PATH))
-
         results = [self.step(x,runs,env,seeds) for x in agents]
-        reward_agents = [-results[p] for p in results]
+        print(device)
+
+        reward_agents = []
+        for i in range(len(results)):
+          reward_agents.append(-results[i])
+        
 
         return reward_agents
 
