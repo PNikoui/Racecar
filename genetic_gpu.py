@@ -31,7 +31,7 @@ class genetic_algo(object):
     def update_weights(self, m, PATH):
       if ((type(m) == nn.Linear) | (type(m) == nn.Conv2d)):
         m.to(device)
-        m.get_device()
+        # m.get_device()
         m.load_state_dict(torch.load(PATH))
           # Update the parameter.
           # New_agents[name].copy_(param)
@@ -43,7 +43,7 @@ class genetic_algo(object):
         agents = []
         for _ in range(num_agents):
 
-            agent = seekndestroy()
+            agent = seekndestroy().cuda()
 
             for param in agent.parameters():
                 param.requires_grad = False
@@ -54,17 +54,18 @@ class genetic_algo(object):
         return agents
 
     def return_random_agents(self, num_agents):
+
         agents = []
         for _ in range(num_agents):
 
-            agent = seekndestroy()
-
+            agent = seekndestroy().cuda()
+                   
             for param in agent.parameters():
                 param.requires_grad = False
 
             self.init_weights(agent)
             agents.append(agent)
-
+           
         return agents
 
     def step(self, agent, runs, env, seeds):
@@ -74,17 +75,23 @@ class genetic_algo(object):
 
         for run in range(runs):
 
-            print("Run number:", run)
+            # print("Run number:", run)
 
             observation = env.reset(seeds[run])
             r = 0
             s = 0
 
             for _ in range(self.max_step):
-                inp = torch.tensor(observation).type('torch.FloatTensor')
-                inp.to(device)
+                inp = torch.tensor(observation).type('torch.FloatTensor').cuda()
+                                
+                # print(torch.cuda.device_count())
+                if torch.cuda.device_count() > 1:
+                  print("Let's use", torch.cuda.device_count(), "GPUs!")
+       
+                agent.to(device)
+
                 mu = agent(inp)
-                mu = mu.detach().numpy()
+                mu = mu.cpu().detach().numpy()
                 action = mu
 
                 action[0][1] = action[0][1] * np.pi / 4
@@ -94,20 +101,16 @@ class genetic_algo(object):
                 r = r + reward
                 s = s + 1
                 
-                # print(type(observation))
-                # print(np.shape(observation))
+                
                 old_DIST = observation[:,-5]
                 # print(old_DIST)
                 old_ANGLE = observation[:,-4]
                 
                 observation = new_observation
                 
-                # print(type(observation))
-                # print(np.shape(observation))
-                # print(observation)
+                
                 parameters = np.array(np.reshape(observation, (1, 35)))
                 new_DIST = parameters[:,-5]
-                # print(np.shape(new_DIST))  
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
                 
@@ -140,9 +143,9 @@ class genetic_algo(object):
         for i in range(runs):
             seeds.append(random.randint(1, 1))
 
-        # model.load_state_dict(torch.load(PATH))
+   
         results = [self.step(x,runs,env,seeds) for x in agents]
-        print(device)
+
 
         reward_agents = []
         for i in range(len(results)):
