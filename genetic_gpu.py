@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from model import seekndestroy
 # from New_model import seekndestroy
 from environment import RacecarEnv
+from environment import closer
 
 # Use GPU
 use_cuda = torch.cuda.is_available()
@@ -72,7 +73,8 @@ class genetic_algo(object):
         rs = []
 
         for run in range(runs):
-          print("Run number:", run)
+
+            print("Run number:", run)
 
             observation = env.reset(seeds[run])
             r = 0
@@ -92,22 +94,31 @@ class genetic_algo(object):
                 r = r + reward
                 s = s + 1
                 
-                old_DIST = observation[-1][-5]
-                # old_ANGLE = observation[:,-4]
+                # print(type(observation))
+                # print(np.shape(observation))
+                old_DIST = observation[:,-5]
+                # print(old_DIST)
+                old_ANGLE = observation[:,-4]
                 
                 observation = new_observation
                 
-                new_DIST = observation[-1][-5]
-                new_ANGLE = observation[-1][-4]
+                # print(type(observation))
+                # print(np.shape(observation))
+                # print(observation)
+                parameters = np.array(np.reshape(observation, (1, 35)))
+                new_DIST = parameters[:,-5]
+                # print(np.shape(new_DIST))  
+                # print(new_DIST)
+                new_ANGLE = parameters[:,-4]
                 
 
                 if(done):
                     break
 
-            if new_ANGLE > np.pi/2   
+            if new_ANGLE > np.pi/2:   
                 r += 100
             
-            if env.closer(old_DIST,new_DIST) == 0:
+            if closer(old_DIST,new_DIST) == 0:
                 r += 100 * 3
 
 
