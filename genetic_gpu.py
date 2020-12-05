@@ -117,6 +117,9 @@ class genetic_algo(object):
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
 
+                if(done):
+                    break
+
             if new_ANGLE > np.pi/2:   
                 r += 100
                 # print("Recieved extra angle penalty")
@@ -125,10 +128,7 @@ class genetic_algo(object):
                 r += np.abs((old_DIST-new_DIST))*10 * 3
                 # print("Recieved extra distance penalty")    
 
-                if(done):
-                    break
 
-            
             if reward == -99:
                 r += np.sqrt((env.goal[0] - env.sim.car[0])**2 + (env.goal[1] - env.sim.car[1])**2) * 10 * 3
 
@@ -316,6 +316,67 @@ class genetic_algo(object):
               # checkpoint = torch.load(PATH)
 
             if generation == generations-1:
+              PATH = 'models/' + '1_turn'
+              torch.save(agents[elite_index].state_dict(), PATH)
+              # Save the final fitness plot  
+              plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
+              plt.xlabel('Epochs')
+              plt.ylabel('Fitness')
+              plt.legend()
+              plt.show()
+              plt.savefig('Fitness.pdf')
+
+    def Curriculum_train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
+
+        LOAD_PATH = 'models/' + file
+        agents = self.return_updated_weights(agents, LOAD_PATH)
+        
+        elite_index = None
+        
+        Fitness = []
+        
+        for generation in range(generations):
+            # return rewards of agents
+
+            
+            rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
+            print(rewards)
+
+            sorted_parent_indexes = np.argsort(rewards)[::-1][:top_limit] # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
+
+            print("\n\n", sorted_parent_indexes)
+
+            top_rewards = []
+            for best_parent in sorted_parent_indexes:
+                top_rewards.append(np.array(rewards)[best_parent])
+
+            Fitness.append(min(top_rewards))
+            
+            print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
+            print("Top ", top_limit, " scores", sorted_parent_indexes)
+            print("Rewards for top: ", top_rewards)
+
+            # setup an empty list for containing children agents
+            children_agents, elite_index, top_score = self.return_children(agents, sorted_parent_indexes, elite_index, Num_Crossover, Mutation_Power)
+
+            # kill all agents, and replace them with their children
+            agents = children_agents
+      
+            # Saving weights
+            if generation % 10 == 0:
+              
+              # Curriculum learning, update the children agents to start from the best saved parent agents
+              PATH = 'models/' + file + '_{}'.format(generation)
+              torch.save(agents[elite_index].state_dict(), PATH)
+              agents = self.return_updated_weights(agents, PATH)           
+
+              # optimizer = TheOptimizerClass(*args, **kwargs)
+              # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+              # checkpoint = torch.load(PATH)
+
+            if generation == generations-1:
+              PATH = 'models/' + '{}_' + 'turns'.format(self.num_turns)
+              torch.save(agents[elite_index].state_dict(), PATH)
               # Save the final fitness plot  
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
               plt.xlabel('Epochs')
