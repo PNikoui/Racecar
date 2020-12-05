@@ -323,8 +323,8 @@ class genetic_algo(object):
               plt.xlabel('Epochs')
               plt.ylabel('Fitness')
               plt.legend()
-              plt.show()
               plt.savefig('Fitness1.pdf')
+              plt.show()
 
     def Curriculum_train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
 
@@ -382,6 +382,6 @@ class genetic_algo(object):
               plt.xlabel('Epochs')
               plt.ylabel('Fitness')
               plt.legend()
-              plt.show()
               figname = 'Fitness' + '_{}'.format(self.num_turns)
               plt.savefig(figname +'.pdf')
+              plt.show()
