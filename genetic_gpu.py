@@ -73,7 +73,7 @@ class genetic_algo(object):
         agent.eval()
         rs = []
 
-        print("NEXT AGENT")
+        # print("NEXT AGENT")
 
         for run in range(runs):
 
