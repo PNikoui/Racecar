@@ -73,6 +73,8 @@ class genetic_algo(object):
         agent.eval()
         rs = []
 
+        print("NEXT AGENT")
+
         for run in range(runs):
 
             # print("Run number:", run)
@@ -89,10 +91,11 @@ class genetic_algo(object):
                   print("Let's use", torch.cuda.device_count(), "GPUs!")
        
                 agent.to(device)
-
+                
                 mu = agent(inp)
                 mu = mu.cpu().detach().numpy()
-                action = mu
+                action = mu.reshape(1,2)
+                
 
                 action[0][1] = action[0][1] * np.pi / 4
 
@@ -101,10 +104,10 @@ class genetic_algo(object):
                 r = r + reward
                 s = s + 1
                 
-                
-                old_DIST = observation[:,-5]
+                old_parameters = np.array(np.reshape(observation, (1, 35)))
+                old_DIST = old_parameters[:,-5]
                 # print(old_DIST)
-                old_ANGLE = observation[:,-4]
+                old_ANGLE = old_parameters[:,-4]
                 
                 observation = new_observation
                 
@@ -113,10 +116,6 @@ class genetic_algo(object):
                 new_DIST = parameters[:,-5]
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
-                
-
-                if(done):
-                    break
 
             if new_ANGLE > np.pi/2:   
                 r += 100
@@ -124,9 +123,12 @@ class genetic_algo(object):
             
             if closer(old_DIST,new_DIST) == 0:
                 r += np.abs((old_DIST-new_DIST))*10 * 3
-                # print("Recieved extra distance penalty")
+                # print("Recieved extra distance penalty")    
 
+                if(done):
+                    break
 
+            
             if reward == -99:
                 r += np.sqrt((env.goal[0] - env.sim.car[0])**2 + (env.goal[1] - env.sim.car[1])**2) * 10 * 3
 
