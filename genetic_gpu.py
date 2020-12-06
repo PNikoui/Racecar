@@ -37,9 +37,8 @@ class genetic_algo(object):
           # New_agents[name].copy_(param)
              
 
-    def return_updated_weights(self, agent, PATH):
+    def return_updated_weights(self, num_agents, PATH):
 
-        num_agents = len(agent)
         agents = []
         for _ in range(num_agents):
 
@@ -304,32 +303,35 @@ class genetic_algo(object):
             agents = children_agents
       
             # Saving weights
-            if generation % 10 == 0:
+            # if generation % 10 == 0:
               
-              # Curriculum learning, update the children agents to start from the best saved parent agents
-              PATH = 'models/' + file + '_{}'.format(generation)
-              torch.save(agents[elite_index].state_dict(), PATH)
-              agents = self.return_updated_weights(agents, PATH)           
+            #   # Curriculum learning, update the children agents to start from the best saved parent agents
+            #   PATH = 'models/' + file + '_{}'.format(generation)
+            #   torch.save(agents[elite_index].state_dict(), PATH)
+            #   agents = self.return_updated_weights(agents, PATH)           
 
               # optimizer = TheOptimizerClass(*args, **kwargs)
               # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
               # checkpoint = torch.load(PATH)
 
             if generation == generations-1:
-              PATH = 'models/' + '1_turn'
+              PATH = 'models/' + '{}_' + 'turn'.format(self.num_turns)
               torch.save(agents[elite_index].state_dict(), PATH)
               # Save the final fitness plot  
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
               plt.xlabel('Epochs')
               plt.ylabel('Fitness')
               plt.legend()
-              plt.savefig('Fitness1.pdf')
+              figname = 'Fitness' + '_{}'.format(self.num_turns)
+              plt.savefig(figname +'.pdf')
               plt.show()
 
     def Curriculum_train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
 
         LOAD_PATH = 'models/' + file
-        agents = self.return_updated_weights(agents, LOAD_PATH)
+        agents = torch.load(LOAD_PATH)
+        # agents = load_state_dict(torch.load(LOAD_PATH))
+        # agents = self.return_updated_weights(num_agents, LOAD_PATH)
         
         elite_index = None
         
@@ -363,12 +365,12 @@ class genetic_algo(object):
             agents = children_agents
       
             # Saving weights
-            if generation % 10 == 0:
+            # if generation % 10 == 0:
               
-              # Curriculum learning, update the children agents to start from the best saved parent agents
-              PATH = 'models/' + file + '_{}'.format(generation)
-              torch.save(agents[elite_index].state_dict(), PATH)
-              agents = self.return_updated_weights(agents, PATH)           
+            #   # Curriculum learning, update the children agents to start from the best saved parent agents
+            #   PATH = 'models/' + file + '_{}'.format(generation)
+            #   torch.save(agents[elite_index].state_dict(), PATH)
+            #   agents = self.return_updated_weights(agents, PATH)           
 
               # optimizer = TheOptimizerClass(*args, **kwargs)
               # optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
