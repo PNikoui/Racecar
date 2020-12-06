@@ -37,7 +37,7 @@ class genetic_algo(object):
           # New_agents[name].copy_(param)
              
 
-    def return_updated_weights(self, num_agents, PATH):
+    def return_updated_weights(self, num_agents):
 
         agents = []
         for _ in range(num_agents):
@@ -47,7 +47,7 @@ class genetic_algo(object):
             for param in agent.parameters():
                 param.requires_grad = False
 
-            self.update_weights(agent, PATH)
+            # self.update_weights(agent, PATH)
             agents.append(agent)
 
         return agents
@@ -315,7 +315,7 @@ class genetic_algo(object):
               # checkpoint = torch.load(PATH)
 
             if generation == generations-1:
-              PATH = 'models/' + '{}_' + 'turn'.format(self.num_turns)
+              PATH = 'models/' + 'turn'+ '_{}'.format(self.num_turns)
               torch.save(agents[elite_index].state_dict(), PATH)
               # Save the final fitness plot  
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
@@ -329,9 +329,10 @@ class genetic_algo(object):
     def Curriculum_train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
 
         LOAD_PATH = 'models/' + file
-        agents = torch.load(LOAD_PATH)
-        # agents = load_state_dict(torch.load(LOAD_PATH))
-        # agents = self.return_updated_weights(num_agents, LOAD_PATH)
+        checkpoint = torch.load(LOAD_PATH)
+        agents = self.return_updated_weights(num_agents)
+        agents.load_state_dict(checkpoint['state_dict']))
+        
         
         elite_index = None
         
@@ -377,7 +378,7 @@ class genetic_algo(object):
               # checkpoint = torch.load(PATH)
 
             if generation == generations-1:
-              PATH = 'models/' + '{}_' + 'turns'.format(self.num_turns)
+              PATH = 'models/' + 'turns'+ '_{}'.format(self.num_turns)
               torch.save(agents[elite_index].state_dict(), PATH)
               # Save the final fitness plot  
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
