@@ -331,7 +331,7 @@ class genetic_algo(object):
         LOAD_PATH = 'models/' + file
         checkpoint = torch.load(LOAD_PATH)
         agents = self.return_updated_weights(num_agents)
-        agents.load_state_dict(checkpoint['state_dict']))
+        agents.load_state_dict(checkpoint['state_dict'])
         
         
         elite_index = None
