@@ -100,6 +100,9 @@ class genetic_algo(object):
 
                 new_observation, reward, done, info = env.step(action)
 
+                if(done):
+                    break
+
                 r = r + reward
                 s = s + 1
                 
@@ -116,8 +119,7 @@ class genetic_algo(object):
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
 
-                if(done):
-                    break
+                
 
             if new_ANGLE > np.pi/2:   
                 r += 100
@@ -144,7 +146,7 @@ class genetic_algo(object):
         seeds = []
         random.seed()
         for i in range(runs):
-            seeds.append(random.randint(1, 1))
+            seeds.append(random.randint(1, 10000))
 
    
         results = [self.step(x,runs,env,seeds) for x in agents]
