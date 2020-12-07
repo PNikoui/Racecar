@@ -280,7 +280,7 @@ class genetic_algo(object):
 
             
             rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
-            print(rewards)
+            # print(rewards)
 
             sorted_parent_indexes = np.argsort(rewards)[::-1][:top_limit] # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
 
@@ -343,7 +343,9 @@ class genetic_algo(object):
 
             
             rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
-            print(rewards)
+            # print(rewards)
+            if sum(shape(rewards))!= len(rewards):
+              rewards = rewards.ravel()
 
             sorted_parent_indexes = np.argsort(rewards)[::-1][:top_limit] # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
 
