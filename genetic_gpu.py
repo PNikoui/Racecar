@@ -28,16 +28,16 @@ class genetic_algo(object):
             nn.init.xavier_uniform(m.weight)
             m.bias.data.fill_(0.00)
 
-    def update_weights(self, m, PATH):
+    def update_weights(self, m, checkpoint):
       if ((type(m) == nn.Linear) | (type(m) == nn.Conv2d)):
         m.to(device)
         # m.get_device()
-        m.load_state_dict(torch.load(PATH))
+        m.load_state_dict(checkpoint['state_dict'])
           # Update the parameter.
           # New_agents[name].copy_(param)
              
 
-    def return_updated_weights(self, num_agents):
+    def return_updated_weights(self, num_agents,checkpoint):
 
         agents = []
         for _ in range(num_agents):
@@ -47,7 +47,7 @@ class genetic_algo(object):
             for param in agent.parameters():
                 param.requires_grad = False
 
-            # self.update_weights(agent, PATH)
+            self.update_weights(agent, checkpoint)
             agents.append(agent)
 
         return agents
@@ -330,8 +330,8 @@ class genetic_algo(object):
 
         LOAD_PATH = 'models/' + file
         checkpoint = torch.load(LOAD_PATH)
-        agents = self.return_updated_weights(num_agents)
-        agents.load_state_dict(checkpoint['state_dict'])
+        agents = self.return_updated_weights(num_agents,checkpoint)
+        # agents.load_state_dict(checkpoint['state_dict'])
         
         
         elite_index = None
