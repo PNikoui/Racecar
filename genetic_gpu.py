@@ -143,8 +143,8 @@ class genetic_algo(object):
 
             rs.append(r)
         GOALS_TOTAL.append(np.copy(Goal_Counter))
-        # print(GOALS_TOTAL)
-        print(sum(GOALS_TOTAL))
+        # print(Goal_Counter)
+        # print(sum(GOALS_TOTAL))
 
         return sum(rs) / runs #, G_Goals
 
@@ -291,6 +291,8 @@ class genetic_algo(object):
         
         Fitness = []
         GOALS_HIT = []
+        # global Goal_Counter 
+        # Goal_Counter = 0
         global GOALS_TOTAL
         GOALS_TOTAL = []
         
@@ -318,6 +320,7 @@ class genetic_algo(object):
                 top_rewards.append(np.array(rewards)[best_parent])
 
             Fitness.append(min(top_rewards))
+            # GOALS_HIT.append(Goal_Counter)
             GOALS_HIT.append(sum(GOALS_TOTAL))
             
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
@@ -331,11 +334,11 @@ class genetic_algo(object):
             agents = children_agents
       
             # Saving weights
-#             if generation % 10 == 0:
-#               plt.bar(len(GOALS_HIT),GOALS_HIT)
-#               plt.xlabel('Generations')
-#               plt.ylabel('Goals Hit')
-#               plt.show()
+            # if generation % 10 == 0:
+            #   plt.bar(np.arange(len(GOALS_HIT)),GOALS_HIT)
+            #   plt.xlabel('Generations')
+            #   plt.ylabel('Goals Hit')
+            #   plt.show()
               
             #   # Curriculum learning, update the children agents to start from the best saved parent agents
             #   PATH = 'models/' + file + '_{}'.format(generation)
@@ -349,16 +352,20 @@ class genetic_algo(object):
             if generation == generations-1:
               PATH = 'models/' + 'turn'+ '_{}'.format(self.num_turns)
               torch.save(agents[elite_index].state_dict(), PATH)
-              # Save the final fitness plot  
+              # Save the final fitness plot
+              f = plt.figure(1)  
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
               plt.xlabel('Epochs')
               plt.ylabel('Fitness')
               plt.legend()
               figname = 'Fitness' + '_{}'.format(self.num_turns)
-              plt.savefig(figname +'.pdf')
-              plt.bar(len(generations),GOALS_HIT)
+              f.savefig(figname +'.pdf')
+              g = plt.figure(2)
+              plt.bar(len(GOALS_HIT),GOALS_HIT)
               plt.xlabel('Generations')
               plt.ylabel('Max Goals Hit')
+              figname2 = 'Goals' + '_{}'.format(self.num_turns)
+              g.savefig(figname2 +'.pdf')
               plt.show()
 
     def Curriculum_train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
@@ -372,6 +379,11 @@ class genetic_algo(object):
         elite_index = None
         
         Fitness = []
+        GOALS_HIT = []
+        # global Goal_Counter 
+        # Goal_Counter = 0
+        global GOALS_TOTAL
+        GOALS_TOTAL = []
         
         for generation in range(generations):
             # return rewards of agents
@@ -391,6 +403,8 @@ class genetic_algo(object):
                 top_rewards.append(np.array(rewards)[best_parent])
 
             Fitness.append(min(top_rewards))
+            # GOALS_HIT.append(Goal_Counter)
+            GOALS_HIT.append(sum(GOALS_TOTAL))
             
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
             print("Top ", top_limit, " scores", sorted_parent_indexes)
@@ -415,13 +429,20 @@ class genetic_algo(object):
               # checkpoint = torch.load(PATH)
 
             if generation == generations-1:
-              PATH = 'models/' + 'turns'+ '_{}'.format(self.num_turns)
+              PATH = 'models/' + 'turn'+ '_{}'.format(self.num_turns)
               torch.save(agents[elite_index].state_dict(), PATH)
-              # Save the final fitness plot  
+              # Save the final fitness plot
+              f = plt.figure(1)  
               plt.plot(np.arange(len(Fitness)), Fitness, '-o', markersize=9, label =('The Top Rewards'))
               plt.xlabel('Epochs')
               plt.ylabel('Fitness')
               plt.legend()
               figname = 'Fitness' + '_{}'.format(self.num_turns)
-              plt.savefig(figname +'.pdf')
+              f.savefig(figname +'.pdf')
+              g = plt.figure(2)
+              plt.bar(len(GOALS_HIT),GOALS_HIT)
+              plt.xlabel('Generations')
+              plt.ylabel('Max Goals Hit')
+              figname2 = 'Goals' + '_{}'.format(self.num_turns)
+              g.savefig(figname2 +'.pdf')
               plt.show()
