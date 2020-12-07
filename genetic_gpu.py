@@ -71,6 +71,7 @@ class genetic_algo(object):
 
         agent.eval()
         rs = []
+        Goal_Counter = 0
 
         # print("NEXT AGENT")
 
@@ -81,6 +82,7 @@ class genetic_algo(object):
             observation = env.reset(seeds[run])
             r = 0
             s = 0
+            
 
             for _ in range(self.max_step):
                 inp = torch.tensor(observation).type('torch.FloatTensor').cuda()
@@ -103,6 +105,8 @@ class genetic_algo(object):
                 if(done):
                     break
 
+                
+                
                 r = r + reward
                 s = s + 1
                 
@@ -119,11 +123,12 @@ class genetic_algo(object):
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
 
-                
+            if reward == 0:
+                  Goal_Counter += 1                
 
             if new_ANGLE > np.pi/2:   
                 r += 100
-                # print("Recieved extra angle penalty")
+                print("Recieved extra angle penalty")
             
             if closer(old_DIST,new_DIST) == 0:
                 r += np.abs((old_DIST-new_DIST))*10 * 3
@@ -137,8 +142,11 @@ class genetic_algo(object):
                 r += np.sqrt((env.goal[0] - env.sim.car[0])**2 + (env.goal[1] - env.sim.car[1])**2) * 10 * 3
 
             rs.append(r)
+        GOALS_TOTAL.append(np.copy(Goal_Counter))
+        # print(GOALS_TOTAL)
+        print(sum(GOALS_TOTAL))
 
-        return sum(rs) / runs
+        return sum(rs) / runs #, G_Goals
 
     def run_agents_n_times(self, agents, runs):
 
@@ -150,6 +158,12 @@ class genetic_algo(object):
 
    
         results = [self.step(x,runs,env,seeds) for x in agents]
+        # print(np.shape(results))
+
+        # G_Goals = np.array(results)[:,1]
+        # # print(np.shape(G_Goals))
+        # results = np.array(results)[:,0]
+
 
 
         reward_agents = []
@@ -157,7 +171,7 @@ class genetic_algo(object):
           reward_agents.append(-results[i])
         
 
-        return reward_agents
+        return reward_agents  #, G_Goals
 
     def crossover(self, father, mother, Num_Crossover):
 
@@ -276,6 +290,9 @@ class genetic_algo(object):
         elite_index = None
         
         Fitness = []
+        GOALS_HIT = []
+        global GOALS_TOTAL
+        GOALS_TOTAL = []
         
         for generation in range(generations):
             # return rewards of agents
@@ -283,8 +300,14 @@ class genetic_algo(object):
             
             rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
             # print(rewards)
+            # G_Goals = np.array(rewards)[:,1]
+            # rewards = np.array(rewards)[:,0]
+            
             if sum(np.shape(rewards))!= len(rewards):
               rewards = np.array(rewards).ravel()
+
+            # print(rewards)
+            # print(np.shape(rewards))
 
             sorted_parent_indexes = np.argsort(rewards)[::-1][:top_limit] # reverses and gives top values (argsort sorts by ascending by default) https://stackoverflow.com/questions/16486252/is-it-possible-to-use-argsort-in-descending-order
 
@@ -295,6 +318,7 @@ class genetic_algo(object):
                 top_rewards.append(np.array(rewards)[best_parent])
 
             Fitness.append(min(top_rewards))
+            GOALS_HIT.append(sum(GOALS_TOTAL))
             
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
             print("Top ", top_limit, " scores", sorted_parent_indexes)
@@ -307,7 +331,11 @@ class genetic_algo(object):
             agents = children_agents
       
             # Saving weights
-            # if generation % 10 == 0:
+#             if generation % 10 == 0:
+#               plt.bar(len(GOALS_HIT),GOALS_HIT)
+#               plt.xlabel('Generations')
+#               plt.ylabel('Goals Hit')
+#               plt.show()
               
             #   # Curriculum learning, update the children agents to start from the best saved parent agents
             #   PATH = 'models/' + file + '_{}'.format(generation)
@@ -328,6 +356,9 @@ class genetic_algo(object):
               plt.legend()
               figname = 'Fitness' + '_{}'.format(self.num_turns)
               plt.savefig(figname +'.pdf')
+              plt.bar(len(generations),GOALS_HIT)
+              plt.xlabel('Generations')
+              plt.ylabel('Max Goals Hit')
               plt.show()
 
     def Curriculum_train(self, num_agents, generations, top_limit, file, Num_Crossover, Mutation_Power):
@@ -346,7 +377,7 @@ class genetic_algo(object):
             # return rewards of agents
 
             
-            rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
+            rewards, G_Goals = self.run_agents_n_times(agents, 3) # return average of 3 runs
             # print(rewards)
             if sum(np.shape(rewards))!= len(rewards):
               rewards = np.array(rewards).ravel()
