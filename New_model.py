@@ -10,8 +10,8 @@ class seekndestroy(nn.Module):
         self.Conv1 = nn.Conv1d(input_dim, 5, 2, stride = 1, padding =1)  #, dilation=2
         self.Pool1 = nn.MaxPool1d(2)
         
-        self.deep_1 = nn.Linear(9, 64, bias=True)
-        self.deep_2 = nn.Linear(64, 30, bias=True)
+        self.deep_1 = nn.Linear(9, 128, bias=True)
+        self.deep_2 = nn.Linear(128, 64, bias=True)
         
 #         self.LSTM = nn.LSTM(input_size=30,
 #                          hidden_size=50,
@@ -23,10 +23,10 @@ class seekndestroy(nn.Module):
 #                             bias=False)
         
         
-        self.deep_3 = nn.Linear(30, 32, bias=True)
+        self.deep_3 = nn.Linear(64, 32, bias=True)
         self.deep_4 = nn.Linear(32, output_dim, bias=True)
         
-        self.BN = nn.BatchNorm1d(64) ##, affine=False)
+        self.BN = nn.BatchNorm1d(128) ##, affine=False)
         
         self.softmax = nn.LogSoftmax(dim=1)
 
@@ -64,7 +64,7 @@ class seekndestroy(nn.Module):
         xd = self.deep_1(xd)
         xd = self.relu(xd)
         
-        xd = self.BN(xd)
+#         xd = self.BN(xd)
         
         xd = self.deep_2(xd)
         xd = self.relu(xd)
