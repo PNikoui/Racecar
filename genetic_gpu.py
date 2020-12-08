@@ -389,7 +389,7 @@ class genetic_algo(object):
             # return rewards of agents
 
             
-            rewards, G_Goals = self.run_agents_n_times(agents, 3) # return average of 3 runs
+            rewards = self.run_agents_n_times(agents, 3) # return average of 3 runs
             # print(rewards)
             if sum(np.shape(rewards))!= len(rewards):
               rewards = np.array(rewards).ravel()
