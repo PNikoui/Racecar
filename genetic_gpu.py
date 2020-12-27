@@ -101,6 +101,8 @@ class genetic_algo(object):
                 action[0][1] = action[0][1] * np.pi / 4
 
                 new_observation, reward, done, info = env.step(action)
+                
+                
 
                 if(done):
                     break
@@ -111,6 +113,10 @@ class genetic_algo(object):
                 s = s + 1
                 
                 old_parameters = np.array(np.reshape(observation, (1, 35)))
+                
+                print(old_parameters)
+                old_Lidar = old_parameters[:,1:30]
+                print(sum(old_Lidar))
                 old_DIST = old_parameters[:,-5]
                 # print(old_DIST)
                 old_ANGLE = old_parameters[:,-4]
@@ -119,16 +125,36 @@ class genetic_algo(object):
                 
                 
                 parameters = np.array(np.reshape(observation, (1, 35)))
+                
+                
+                new_Lidar = parameters[:,1:30]
+                print(new_Lidar)
+                print(sum(new_Lidar))
                 new_DIST = parameters[:,-5]
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
 
             if reward == 0:
-                  Goal_Counter += 1                
+                  Goal_Counter += 1        
+                    
+                    
+        ## Adding a penalty for the physical restraints of the system, the car cannot turn more than a certain amount. The exact angle yet to be determined 
 
             if new_ANGLE > np.pi/2:   
                 r += 100
                 print("Recieved extra angle penalty")
+                
+                
+######### 15 is an estimate for when half of the lidar measurements (30 total) are 0.5 meaning starting to head towards a wall. You want to minimize this value because the lidar scan returns the distance of a dectection of an obstacle, then its subtracted from the length of the track (1-scan) which is essentially then the amount the car deviated from the track. Penalized if facing a wall too much:
+
+            if sum(new_Lidar) > 15:   
+                r += sum(new_Lidar)*10
+            
+            
+            ## Here the car is penalized if facing a wall too much and heading towards it:  
+            
+            if ((sum(new_Lidar) > 15) and (sum(old_Lidar) < sum(new_Lidar))):
+                r += abs(sum(new_Lidar))*3 
             
             if closer(old_DIST,new_DIST) == 0:
                 r += np.abs((old_DIST-new_DIST))*10 * 3
