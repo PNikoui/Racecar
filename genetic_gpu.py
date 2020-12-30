@@ -114,8 +114,8 @@ class genetic_algo(object):
                 
                 old_parameters = np.array(np.reshape(observation, (1, 35)))
                 
-                print(old_parameters)
-                old_Lidar = old_parameters[:,1:30]
+#                 print(old_parameters)
+                old_Lidar = sum(old_parameters[:,1:30])
                 print(sum(old_Lidar))
                 old_DIST = old_parameters[:,-5]
                 # print(old_DIST)
@@ -127,8 +127,8 @@ class genetic_algo(object):
                 parameters = np.array(np.reshape(observation, (1, 35)))
                 
                 
-                new_Lidar = parameters[:,1:30]
-                print(new_Lidar)
+                new_Lidar = sum(parameters[:,1:30])
+#                 print(new_Lidar)
                 print(sum(new_Lidar))
                 new_DIST = parameters[:,-5]
                 # print(new_DIST)
@@ -148,13 +148,16 @@ class genetic_algo(object):
 ######### 15 is an estimate for when half of the lidar measurements (30 total) are 0.5 meaning starting to head towards a wall. You want to minimize this value because the lidar scan returns the distance of a dectection of an obstacle, then its subtracted from the length of the track (1-scan) which is essentially then the amount the car deviated from the track. Penalized if facing a wall too much:
 
             if sum(new_Lidar) > 15:   
-                r += sum(new_Lidar)*10
+                r += np.abs(sum(new_Lidar))*10
+            print("Recieved extra Lidar penalty")
             
             
             ## Here the car is penalized if facing a wall too much and heading towards it:  
             
             if ((sum(new_Lidar) > 15) and (sum(old_Lidar) < sum(new_Lidar))):
-                r += abs(sum(new_Lidar))*3 
+                r += np.abs(sum(new_Lidar))*30
+                print("Recieved additional Lidar and direction penalty")
+            
             
             if closer(old_DIST,new_DIST) == 0:
                 r += np.abs((old_DIST-new_DIST))*10 * 3
