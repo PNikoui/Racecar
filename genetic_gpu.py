@@ -5,8 +5,8 @@ import random
 import copy
 import matplotlib.pyplot as plt 
 
-# from model import seekndestroy
-from New_model import seekndestroy
+from model import seekndestroy
+# from New_model import seekndestroy
 from environment import RacecarEnv
 from environment import closer
 
@@ -72,6 +72,7 @@ class genetic_algo(object):
         agent.eval()
         rs = []
         Goal_Counter = 0
+        Action_Counter = np.zeros(3)
 
         # print("NEXT AGENT")
 
@@ -80,11 +81,14 @@ class genetic_algo(object):
             # print("Run number:", run)
 
             observation = env.reset(seeds[run])
+            
+            Action_Counter[run] = Total_Steps
+            
             r = 0
-            s = 0
+            Total_Steps = 0
             
 
-            for _ in range(self.max_step):
+            for STEP in range(self.max_step):
                 inp = torch.tensor(observation).type('torch.FloatTensor').cuda()
                                 
                 # print(torch.cuda.device_count())
@@ -103,6 +107,7 @@ class genetic_algo(object):
                 new_observation, reward, done, info = env.step(action)
                 
                 
+               
 
                 if(done):
                     break
@@ -110,7 +115,8 @@ class genetic_algo(object):
                 
                 
                 r = r + reward
-                s = s + 1
+                Total_Steps += 1 
+                
                 
                 old_parameters = np.array(np.reshape(observation, (1, 35)))
                 
@@ -121,8 +127,10 @@ class genetic_algo(object):
                 # print(old_DIST)
                 old_ANGLE = old_parameters[:,-4]
                 
-                observation = new_observation
                 
+                #############################
+                observation = new_observation
+                #############################
                 
                 parameters = np.array(np.reshape(observation, (1, 35)))
                 
@@ -133,37 +141,72 @@ class genetic_algo(object):
                 new_DIST = parameters[:,-5]
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
-
-            if reward == 0:
-                  Goal_Counter += 1        
-                    
-                    
-        ## Adding a penalty for the physical restraints of the system, the car cannot turn more than a certain amount. The exact angle yet to be determined 
-
-            if new_ANGLE > np.pi/2:   
-                r += 100
-                print("Recieved extra angle penalty")
                 
                 
-######### 15 is an estimate for when half of the lidar measurements (30 total) are 0.5 meaning starting to head towards a wall. You want to minimize this value because the lidar scan returns the distance of a dectection of an obstacle, then its subtracted from the length of the track (1-scan) which is essentially then the amount the car deviated from the track. Penalized if facing a wall too much:
+        
+            ## ACTION BASED PENALTIES (inner for loop):
+                
+                             
+            ## Adding a penalty for the physical restraints of the system, the car cannot turn more than a certain amount. The exact angle yet to be determined 
 
-            if sum(new_Lidar) > 15:   
-                r += np.abs(sum(new_Lidar))*10
-            print("Recieved extra Lidar penalty")
+#                 if new_ANGLE > np.pi/2:   
+#                     r += 100
+#                     print("Recieved extra angle penalty")
+
+                
+            ## 15 is an estimate for when half of the lidar measurements (30 total) are 0.5 meaning starting to head towards a wall. You want to minimize this value
+            ## because the lidar scan returns the distance of a dectection of an obstacle, then its subtracted from the length of the track (1-scan) which is essentially
+            ## then the amount the car deviated from the track. Penalized if facing a wall too much:
+
+                if sum(new_Lidar) > 20:   
+                    r += np.abs(sum(new_Lidar))*10
+                print("Recieved extra Lidar penalty")
             
             
             ## Here the car is penalized if facing a wall too much and heading towards it:  
             
-            if ((sum(new_Lidar) > 15) and (sum(old_Lidar) < sum(new_Lidar))):
-                r += np.abs(sum(new_Lidar))*30
-                print("Recieved additional Lidar and direction penalty")
-            
-            
-            if closer(old_DIST,new_DIST) == 0:
-                r += np.abs((old_DIST-new_DIST))*10 * 3
-                # print("Recieved extra distance penalty")    
+                if ((sum(new_Lidar) > 20) and (sum(old_Lidar) < sum(new_Lidar))):
+                    r += np.abs(sum(new_Lidar))*30
+                    print("Recieved additional Lidar and direction penalty")
 
 
+                if closer(old_DIST,new_DIST) == 0:
+                    r += np.abs((old_DIST-new_DIST))*10 * 3
+                    # print("Recieved extra distance penalty")  
+                    
+                    
+            ## (outer for loop)       
+            ## Here a penalty is added if the car takes fewer steps than the previous car (hits a wall fast):
+                    
+            if run == 1:
+                
+                if Action_Counter[0] > Action_Counter[1]:
+                     r += np.abs(Action_Counter[0] - Action_Counter[1])*2
+                        
+                        
+            if run == 2:
+                    
+                if Action_Counter[1] > Action_Counter[2]:
+                    r += np.abs(Action_Counter[1] - Action_Counter[2])*2
+                    
+                    
+                ## Bad Momentum (Number of successful steps decrease for all runs)
+                
+                if (Action_Counter[0] > Action_Counter[1]) and (Action_Counter[1] > Action_Counter[2]):
+                    r += (np.abs(Action_Counter[0] - Action_Counter[1]) + np.abs(Action_Counter[1] - Action_Counter[2]))*10 
+
+           
+                    
+            
+            ## GOAL STATUS BASED PENALTIES:
+            
+            ## Goal count:
+
+            if reward == 0:
+                  Goal_Counter += 1        
+
+            ## Penalties for Goal status: 
+            
             if reward == -99:
                 r += np.sqrt((env.goal[0] - env.sim.car[0])**2 + (env.goal[1] - env.sim.car[1])**2) * 10 * 3
 
