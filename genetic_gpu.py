@@ -72,7 +72,8 @@ class genetic_algo(object):
         agent.eval()
         rs = []
         Goal_Counter = 0
-        Action_Counter = np.zeros(3)
+        Total_Steps = 0
+        Action_Counter = np.zeros(runs)
 
         # print("NEXT AGENT")
 
@@ -88,7 +89,7 @@ class genetic_algo(object):
             Total_Steps = 0
             
 
-            for STEP in range(self.max_step):
+            for _ in range(self.max_step):
                 inp = torch.tensor(observation).type('torch.FloatTensor').cuda()
                                 
                 # print(torch.cuda.device_count())
@@ -122,7 +123,7 @@ class genetic_algo(object):
                 
 #                 print(old_parameters)
                 old_Lidar = sum(old_parameters[:,1:30])
-                print(sum(old_Lidar))
+                # print(sum(old_Lidar))
                 old_DIST = old_parameters[:,-5]
                 # print(old_DIST)
                 old_ANGLE = old_parameters[:,-4]
@@ -137,7 +138,7 @@ class genetic_algo(object):
                 
                 new_Lidar = sum(parameters[:,1:30])
 #                 print(new_Lidar)
-                print(sum(new_Lidar))
+                # print(sum(new_Lidar))
                 new_DIST = parameters[:,-5]
                 # print(new_DIST)
                 new_ANGLE = parameters[:,-4]
@@ -160,14 +161,14 @@ class genetic_algo(object):
 
                 if sum(new_Lidar) > 20:   
                     r += np.abs(sum(new_Lidar))*10
-                print("Recieved extra Lidar penalty")
+                # print("Recieved extra Lidar penalty")
             
             
             ## Here the car is penalized if facing a wall too much and heading towards it:  
             
                 if ((sum(new_Lidar) > 20) and (sum(old_Lidar) < sum(new_Lidar))):
                     r += np.abs(sum(new_Lidar))*30
-                    print("Recieved additional Lidar and direction penalty")
+                    # print("Recieved additional Lidar and direction penalty")
 
 
                 if closer(old_DIST,new_DIST) == 0:
@@ -194,6 +195,17 @@ class genetic_algo(object):
                 
                 if (Action_Counter[0] > Action_Counter[1]) and (Action_Counter[1] > Action_Counter[2]):
                     r += (np.abs(Action_Counter[0] - Action_Counter[1]) + np.abs(Action_Counter[1] - Action_Counter[2]))*10 
+
+#             if run == 3:
+                    
+#                 if Action_Counter[2] > Action_Counter[3]:
+#                     r += np.abs(Action_Counter[2] - Action_Counter[3])*2
+                    
+                    
+#                 ## Bad Momentum (Number of successful steps decrease for all runs)
+                
+#                 if ((Action_Counter[0] > Action_Counter[1]) and (Action_Counter[1] > Action_Counter[2]) and (Action_Counter[2] > Action_Counter[3])):
+#                     r += (np.abs(Action_Counter[0] - Action_Counter[1]) + np.abs(Action_Counter[1] - Action_Counter[2]) + np.abs(Action_Counter[2] - Action_Counter[3]))*10 
 
            
                     
@@ -335,7 +347,7 @@ class genetic_algo(object):
         top_elite_index = None
 
         test_agents = [agents[i] for i in candidate_elite_index]
-        scores = self.run_agents_n_times(test_agents, runs=5)
+        scores = self.run_agents_n_times(test_agents, runs=3)
 
         for n, i in enumerate(candidate_elite_index):
             score = scores[n]
@@ -398,6 +410,7 @@ class genetic_algo(object):
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
             print("Top ", top_limit, " scores", sorted_parent_indexes)
             print("Rewards for top: ", top_rewards)
+            print("Number of Goals Hit:", GOALS_HIT)
 
             # setup an empty list for containing children agents
             children_agents, elite_index, top_score = self.return_children(agents, sorted_parent_indexes, elite_index, Num_Crossover, Mutation_Power)
@@ -481,6 +494,7 @@ class genetic_algo(object):
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
             print("Top ", top_limit, " scores", sorted_parent_indexes)
             print("Rewards for top: ", top_rewards)
+            print("Number of Goals Hit:", GOALS_HIT)
 
             # setup an empty list for containing children agents
             children_agents, elite_index, top_score = self.return_children(agents, sorted_parent_indexes, elite_index, Num_Crossover, Mutation_Power)
