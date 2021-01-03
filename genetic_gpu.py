@@ -122,7 +122,9 @@ class genetic_algo(object):
                 old_parameters = np.array(np.reshape(observation, (1, 35)))
                 
 #                 print(old_parameters)
-                old_Lidar = sum(old_parameters[:,1:30])
+#                 old_Lidar = sum(old_parameters[:,1:30])
+                old_left_Lidar = old_parameters[:,6]
+                old_right_Lidar = old_parameters[:,24]
                 # print(sum(old_Lidar))
                 old_DIST = old_parameters[:,-5]
                 # print(old_DIST)
@@ -136,7 +138,10 @@ class genetic_algo(object):
                 parameters = np.array(np.reshape(observation, (1, 35)))
                 
                 
-                new_Lidar = sum(parameters[:,1:30])
+#                 new_Lidar = sum(parameters[:,1:30])
+                new_left_Lidar = parameters[:,6]
+                new_right_Lidar = parameters[:,24]
+                Lidar_Diff = np.abs(new_left_Lidar - new_right_Lidar)
 #                 print(new_Lidar)
                 # print(sum(new_Lidar))
                 new_DIST = parameters[:,-5]
@@ -162,6 +167,14 @@ class genetic_algo(object):
 #                 if sum(new_Lidar) > 20:   
 #                     r += np.abs(sum(new_Lidar))*10
 #                 # print("Recieved extra Lidar penalty")
+
+                print(old_left_Lidar-old_right_Lidar)
+                print(Lidar_Diff)
+
+                if Lidar_Diff > 0.1:
+                    r += Lidar_Diff*100
+            
+            
             
             
 #             ## Here the car is penalized if facing a wall too much and heading towards it:  
@@ -179,16 +192,16 @@ class genetic_algo(object):
             ## (outer for loop)       
             ## Here a penalty is added if the car takes fewer steps than the previous car (hits a wall fast):
                     
-            if run == 1:
+#             if run == 1:
                 
-                if Action_Counter[0] > Action_Counter[1]:
-                     r += np.abs(Action_Counter[0] - Action_Counter[1])*2
+#                 if Action_Counter[0] > Action_Counter[1]:
+#                      r += np.abs(Action_Counter[0] - Action_Counter[1])*2
                         
                         
-            if run == 2:
+            if run == runs-1:
                     
-                if Action_Counter[1] > Action_Counter[2]:
-                    r += np.abs(Action_Counter[1] - Action_Counter[2])*2
+#                 if Action_Counter[1] > Action_Counter[2]:
+#                     r += np.abs(Action_Counter[1] - Action_Counter[2])*2
                     
                     
                 ## Bad Momentum (Number of successful steps decrease for all runs)
@@ -410,7 +423,7 @@ class genetic_algo(object):
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
             print("Top ", top_limit, " scores", sorted_parent_indexes)
             print("Rewards for top: ", top_rewards)
-            print("Number of Goals Hit:", GOALS_HIT)
+            print("Number of Goals Hit:", GOALS_HIT[generation])
 
             # setup an empty list for containing children agents
             children_agents, elite_index, top_score = self.return_children(agents, sorted_parent_indexes, elite_index, Num_Crossover, Mutation_Power)
@@ -494,7 +507,7 @@ class genetic_algo(object):
             print("Generation ", generation, " | Mean rewards: ", np.mean(rewards), " | Mean of top 5: ", np.mean(top_rewards[:5]))
             print("Top ", top_limit, " scores", sorted_parent_indexes)
             print("Rewards for top: ", top_rewards)
-            print("Number of Goals Hit:", GOALS_HIT)
+            print("Number of Goals Hit:", GOALS_HIT[generation])
 
             # setup an empty list for containing children agents
             children_agents, elite_index, top_score = self.return_children(agents, sorted_parent_indexes, elite_index, Num_Crossover, Mutation_Power)
