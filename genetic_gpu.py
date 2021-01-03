@@ -140,7 +140,9 @@ class genetic_algo(object):
                 
 #                 new_Lidar = sum(parameters[:,1:30])
                 new_left_Lidar = parameters[:,6]
+                print("left", new_left_Lidar)
                 new_right_Lidar = parameters[:,24]
+                print("right", new_right_Lidar)
                 Lidar_Diff = np.abs(new_left_Lidar - new_right_Lidar)
 #                 print(new_Lidar)
                 # print(sum(new_Lidar))
@@ -155,8 +157,8 @@ class genetic_algo(object):
                              
             ## Adding a penalty for the physical restraints of the system, the car cannot turn more than a certain amount. The exact angle yet to be determined 
 
-#                 if new_ANGLE > np.pi/2:   
-#                     r += 100
+                if new_ANGLE > np.pi/2:   
+                    r += 100
 #                     print("Recieved extra angle penalty")
 
                 
@@ -171,7 +173,7 @@ class genetic_algo(object):
                 print(old_left_Lidar-old_right_Lidar)
                 print(Lidar_Diff)
 
-                if Lidar_Diff > 0.1:
+                if Lidar_Diff > 0.3:
                     r += Lidar_Diff*100
             
             
@@ -192,33 +194,33 @@ class genetic_algo(object):
             ## (outer for loop)       
             ## Here a penalty is added if the car takes fewer steps than the previous car (hits a wall fast):
                     
-#             if run == 1:
-                
-#                 if Action_Counter[0] > Action_Counter[1]:
-#                      r += np.abs(Action_Counter[0] - Action_Counter[1])*2
-                        
-                        
-            if run == runs-1:
-                    
-#                 if Action_Counter[1] > Action_Counter[2]:
-#                     r += np.abs(Action_Counter[1] - Action_Counter[2])*2
-                    
-                    
-                ## Bad Momentum (Number of successful steps decrease for all runs)
-                
-                if (Action_Counter[0] > Action_Counter[1]) and (Action_Counter[1] > Action_Counter[2]):
-                    r += (np.abs(Action_Counter[0] - Action_Counter[1]) + np.abs(Action_Counter[1] - Action_Counter[2]))*10 
+    #             if run == 1:
 
-#             if run == 3:
-                    
-#                 if Action_Counter[2] > Action_Counter[3]:
-#                     r += np.abs(Action_Counter[2] - Action_Counter[3])*2
-                    
-                    
-#                 ## Bad Momentum (Number of successful steps decrease for all runs)
-                
-#                 if ((Action_Counter[0] > Action_Counter[1]) and (Action_Counter[1] > Action_Counter[2]) and (Action_Counter[2] > Action_Counter[3])):
-#                     r += (np.abs(Action_Counter[0] - Action_Counter[1]) + np.abs(Action_Counter[1] - Action_Counter[2]) + np.abs(Action_Counter[2] - Action_Counter[3]))*10 
+    #                 if Action_Counter[0] > Action_Counter[1]:
+    #                      r += np.abs(Action_Counter[0] - Action_Counter[1])*2
+
+
+#                 if run == runs-1:
+
+    #                 if Action_Counter[1] > Action_Counter[2]:
+    #                     r += np.abs(Action_Counter[1] - Action_Counter[2])*2
+
+
+                    ## Bad Momentum (Number of successful steps decrease for all runs)
+
+#                     if (Action_Counter[0] > Action_Counter[1]) and (Action_Counter[1] > Action_Counter[2]):
+#                         r += (np.abs(Action_Counter[0] - Action_Counter[1]) + np.abs(Action_Counter[1] - Action_Counter[2]))*10 
+
+    #             if run == 3:
+
+    #                 if Action_Counter[2] > Action_Counter[3]:
+    #                     r += np.abs(Action_Counter[2] - Action_Counter[3])*2
+
+
+    #                 ## Bad Momentum (Number of successful steps decrease for all runs)
+
+    #                 if ((Action_Counter[0] > Action_Counter[1]) and (Action_Counter[1] > Action_Counter[2]) and (Action_Counter[2] > Action_Counter[3])):
+    #                     r += (np.abs(Action_Counter[0] - Action_Counter[1]) + np.abs(Action_Counter[1] - Action_Counter[2]) + np.abs(Action_Counter[2] - Action_Counter[3]))*10 
 
            
                     
