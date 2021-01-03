@@ -159,16 +159,16 @@ class genetic_algo(object):
             ## because the lidar scan returns the distance of a dectection of an obstacle, then its subtracted from the length of the track (1-scan) which is essentially
             ## then the amount the car deviated from the track. Penalized if facing a wall too much:
 
-                if sum(new_Lidar) > 20:   
-                    r += np.abs(sum(new_Lidar))*10
-                # print("Recieved extra Lidar penalty")
+#                 if sum(new_Lidar) > 20:   
+#                     r += np.abs(sum(new_Lidar))*10
+#                 # print("Recieved extra Lidar penalty")
             
             
-            ## Here the car is penalized if facing a wall too much and heading towards it:  
+#             ## Here the car is penalized if facing a wall too much and heading towards it:  
             
-                if ((sum(new_Lidar) > 20) and (sum(old_Lidar) < sum(new_Lidar))):
-                    r += np.abs(sum(new_Lidar))*30
-                    # print("Recieved additional Lidar and direction penalty")
+#                 if ((sum(new_Lidar) > 20) and (sum(old_Lidar) < sum(new_Lidar))):
+#                     r += np.abs(sum(new_Lidar))*30
+#                     # print("Recieved additional Lidar and direction penalty")
 
 
                 if closer(old_DIST,new_DIST) == 0:
@@ -347,7 +347,7 @@ class genetic_algo(object):
         top_elite_index = None
 
         test_agents = [agents[i] for i in candidate_elite_index]
-        scores = self.run_agents_n_times(test_agents, runs=3)
+        scores = self.run_agents_n_times(test_agents, runs=5)
 
         for n, i in enumerate(candidate_elite_index):
             score = scores[n]
