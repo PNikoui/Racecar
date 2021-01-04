@@ -140,11 +140,19 @@ class genetic_algo(object):
                 
 #                 new_Lidar = sum(parameters[:,1:30])
                 new_left_Lidar = parameters[:,6]
-                print("left", new_left_Lidar)
+#                 print("left", new_left_Lidar)
                 new_right_Lidar = parameters[:,24]
-                print("right", new_right_Lidar)
+#                 print("right", new_right_Lidar)
                 Lidar_Diff = np.abs(new_left_Lidar - new_right_Lidar)
 #                 print(new_Lidar)
+
+                new_left_Lidar_Range = parameters[:,4:8]
+#                 print("left", new_left_Lidar)
+                new_right_Lidar_Range = parameters[:,22:26]
+#                 print("right", new_right_Lidar)
+                Lidar_Range_Diff = np.abs(new_left_Lidar_Range - new_right_Lidar_Range)
+#                 print(new_Lidar)
+
                 # print(sum(new_Lidar))
                 new_DIST = parameters[:,-5]
                 # print(new_DIST)
@@ -170,10 +178,14 @@ class genetic_algo(object):
 #                     r += np.abs(sum(new_Lidar))*10
 #                 # print("Recieved extra Lidar penalty")
 
-                print(old_left_Lidar-old_right_Lidar)
-                print(Lidar_Diff)
+#                 print(old_left_Lidar-old_right_Lidar)
+#                 print(Lidar_Diff)
 
-                if Lidar_Diff > 0.3:
+#                 if Lidar_Diff > 0.3:
+#                     r += Lidar_Diff*100
+
+
+                if Lidar_Range_Diff > 0.6:
                     r += Lidar_Diff*100
             
             
