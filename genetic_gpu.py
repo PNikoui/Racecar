@@ -146,9 +146,9 @@ class genetic_algo(object):
                 Lidar_Diff = np.abs(new_left_Lidar - new_right_Lidar)
 #                 print(new_Lidar)
 
-                new_left_Lidar_Range = parameters[:,4:8]
+                new_left_Lidar_Range = sum(parameters[:,4:8])/5
 #                 print("left", new_left_Lidar)
-                new_right_Lidar_Range = parameters[:,22:26]
+                new_right_Lidar_Range = sum(parameters[:,22:26])/5
 #                 print("right", new_right_Lidar)
                 Lidar_Range_Diff = np.abs(new_left_Lidar_Range - new_right_Lidar_Range)
 #                 print(new_Lidar)
