@@ -2,6 +2,6 @@
 from gym.envs.registration import register
 
 register(
-    id='Racecar-v0',
+    id='RacecarEnv-v0',
     entry_point='Racecar.envs.environment:RacecarEnv',
 )
