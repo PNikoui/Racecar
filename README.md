@@ -37,7 +37,8 @@ The performance of different model architectures are investigated. The models ar
 
 ## Results and Plots
 Here is a 3 turn map example:
-![3 Turn Map Example](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/Maps/Map3.JPG){:height="36px" width="36px"}.
+
+![3 Turn Map Example](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/Maps/Map3.JPG)
 
 These are performance plots for a 4 layer deep FNN on such a 3 turn map: 
 ![Fitness Plot for 3 Turn Map with Vanilla Network](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/51%20Generations%20Vanilla/Fitness3.JPG)
