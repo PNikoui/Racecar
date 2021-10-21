@@ -1,6 +1,6 @@
 # Neuroevolutionary Training of an Autonomous Racecar
 
-Self-driving cars are a major area of research from both universities and the private sector nowadays. They will revolutionize transportation in a similar way that the first Ford cars did in the $19^{th}$ century. Some of the important areas where they will have an impact are road safety, where driver behaviour or error are a factor in 94 percent of crashes, higher independence for disabled people, reduced congestion and environmental benefits [[1]](#1).
+Self-driving cars are a major area of research from both universities and the private sector nowadays. They will revolutionize transportation in a similar way that the first Ford cars did in the 19th century. Some of the important areas where they will have an impact are road safety, where driver behaviour or error are a factor in 94 percent of crashes, higher independence for disabled people, reduced congestion and environmental benefits [[1]](#1).
 
 Two methods of achieving self-driving cars are backpropagation-based reinforcement learning algorithms (RL) and genetic algorithms (GA). This repository will focus on GAs in combination with curriculum learning. The basis for this project was provided Deloitte Denmark with whom we have collaborated throughout the project.
 
@@ -36,11 +36,11 @@ The performance of different model architectures are investigated. The models ar
 
 
 ## Results and Plots
-![3 Turn Map Example](./Images/Map3.JPG)
+![3 Turn Map Example](Images/Map3.JPG)
 
-![Fitness Plot for 3 Turn Map with Vanilla Network](./Images/51 Generations Vanilla/Fitness3.JPG)
+![Fitness Plot for 3 Turn Map with Vanilla Network](Images/51 Generations Vanilla/Fitness3.JPG)
 
-![Goals Plot for 3 Turn Map with Vanilla Network](./Images/51 Generations Vanilla/Goal3.JPG)
+![Goals Plot for 3 Turn Map with Vanilla Network](Images/51 Generations Vanilla/Goal3.JPG)
 
 
 
