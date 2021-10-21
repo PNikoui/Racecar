@@ -36,11 +36,11 @@ The performance of different model architectures are investigated. The models ar
 
 
 ## Results and Plots
-![3 Turn Map Example](Images/Map3.JPG)
+![3 Turn Map Example](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/Maps/Map3.JPG)
 
-![Fitness Plot for 3 Turn Map with Vanilla Network](Images/51 Generations Vanilla/Fitness3.JPG)
+![Fitness Plot for 3 Turn Map with Vanilla Network](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/51%20Generations%20Vanilla/Fitness3.JPG)
 
-![Goals Plot for 3 Turn Map with Vanilla Network](Images/51 Generations Vanilla/Goal3.JPG)
+![Goals Plot for 3 Turn Map with Vanilla Network](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/51%20Generations%20Vanilla/Goal3.JPG)
 
 
 
