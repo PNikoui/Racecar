@@ -40,7 +40,8 @@ Here is a 3 turn map example:
 
 ![3 Turn Map Example](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/Maps/Map3.JPG)
 
-These are performance plots for a 4 layer deep FNN on such a 3 turn map: 
+These are performance plots for a 4 layer deep FNN on such a 3 turn map using 51 training epochs or, in other words, 51 generations of evolution:
+
 ![Fitness Plot for 3 Turn Map with Vanilla Network](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/51%20Generations%20Vanilla/Fitness3.JPG)
 ![Goals Plot for 3 Turn Map with Vanilla Network](https://github.com/PNikoui/Racecar/blob/Fall_2020/Images/51%20Generations%20Vanilla/Goal3.JPG)
 
